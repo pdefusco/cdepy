@@ -1,0 +1,5 @@
+pandas
+requests-toolbelt
+xmltodict
+yagmail[all]
+pyparsing
