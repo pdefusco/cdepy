@@ -3,9 +3,9 @@ Module to define CDE Jobs
 """
 
 from abc import ABC, abstractmethod
-from cdeconnection import CdeConnection
+from cdepy.cdeconnection import CdeConnection
 
-class CdeJobDefinition(ABC):
+class CdeJob(ABC):
 
     """
     Class to define CDE Job
@@ -15,24 +15,21 @@ class CdeJobDefinition(ABC):
         pass
 
 
-class CdeSparkJobDefinition(CdeJobDefinition):
+class CdeSparkJob(CdeJob):
 
     """
     Class to define CDE Spark Jobs
     """
 
-    def __init__(self, cdeConnection, cdeSparkJobDefinition=None):
-        self.cdeSparkJobDefinition = cdeSparkJobDefinition
+    def __init__(self, cdeConnection):
         self.clusterConnection = cdeConnection
         self.WORKLOAD_USER = self.clusterConnection.WORKLOAD_USER
 
-    def setSparkJobDefinition(self, CDE_JOB_NAME, CDE_RESOURCE_NAME, APPLICATION_FILE_NAME, SPARK_CONFS={"spark.pyspark.python": "python3"}):
+    def createJobDefinition(self, CDE_JOB_NAME, CDE_RESOURCE_NAME, APPLICATION_FILE_NAME, SPARK_CONFS={"spark.pyspark.python": "python3"}):
         """
         Method to create CDE Spark Job Definition
         Requires CDE Job Name, CDE Files Resource Name, Application File Name, and optionally spark configs
         """
-
-        print("Setting CDE Spark Job Definition in Progress\n")
 
         ### Any Spark Job Configuration Options (Not Mandatory) ###
         #spark_confs_example = {
@@ -74,18 +71,17 @@ class CdeSparkJobDefinition(CdeJobDefinition):
         return cdeSparkJobDefinition
 
 
-class CdeAirflowJobDefinition(CdeJobDefinition):
+class CdeAirflowJob(CdeJob):
 
     """
     Class to define CDE Airflow Jobs
     """
 
-    def __init__(self, cdeConnection, cdeAirflowJobDefinition=None):
-        self.cdeAirflowJobDefinition = cdeAirflowJobDefinition
+    def __init__(self, cdeConnection):
         self.clusterConnection = cdeConnection
         self.WORKLOAD_USER = self.clusterConnection.WORKLOAD_USER
 
-    def setJobDefinition(self, CDE_JOB_NAME, DAG_FILE):
+    def createJobDefinition(self, CDE_JOB_NAME, DAG_FILE):
         """
         Method to create CDE Job Definition of type Airflow
         Requires CDE Job Name, Application File Name and optionally CDE Files Resource Name

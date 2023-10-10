@@ -4,7 +4,7 @@ Module to define CDE Resources
 
 from abc import ABC, abstractmethod
 
-class CdeResourceDefinition(ABC):
+class CdeResource(ABC):
     """
     Abstract Class to define CDE Resource
     """
@@ -12,8 +12,7 @@ class CdeResourceDefinition(ABC):
     def createResourceDefinition(self):
         raise NotImplementedError
 
-
-class CdeFilesResourceDefinition(CdeResourceDefinition):
+class CdeFilesResource(CdeResource):
     """
     Class to define CDE Resource of type Files
     """
@@ -34,7 +33,7 @@ class CdeFilesResourceDefinition(CdeResourceDefinition):
 
         return cdeFilesResourceDefinition
 
-class CdePythonResourceDefinition(CdeResourceDefinition):
+class CdePythonResource(CdeResource):
     """
     Class to define CDE Resource or type Python Environment
     """

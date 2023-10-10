@@ -11,9 +11,9 @@ from cdepy import cderesource
 # Create a Connection to CDE and set Token #
 ############################################
 
-JOBS_API_URL = "<myJobsApiURL>"
-WORKLOAD_USER = "<myCdpWorkloadUser>"
-WORKLOAD_PASSWORD = "<myCdpWorkloadPassword>"
+JOBS_API_URL = "https://<YOUR-CLUSTER>.cloudera.site/dex/api/v1"
+WORKLOAD_USER = "<Your-CDP-Workload-User>"
+WORKLOAD_PASSWORD = "<Your-CDP-Workload-Password>"
 
 myCdeConnection = cdeconnection.CdeConnection(JOBS_API_URL, WORKLOAD_USER, WORKLOAD_PASSWORD)
 
@@ -24,23 +24,24 @@ myCdeConnection.setToken()
 ############################################
 
 CDE_RESOURCE_NAME = "myFilesCdeResource"
-myCdeFilesResourceDefinition = cderesource.CdeFilesResourceDefinition(CDE_RESOURCE_NAME)
+myCdeFilesResource = cderesource.CdeFilesResource(CDE_RESOURCE_NAME)
+myCdeFilesResourceDefinition = myCdeFilesResource.createResourceDefinition()
 
 ############################################
 # Create a CDE Spark Job  Definition       #
 ############################################
 
-CDE_JOB_NAME = "<myCdeSparkJob>"
-APPLICATION_FILE_NAME = "mySparkScript.py"
+CDE_JOB_NAME = "myCdeSparkJob"
+APPLICATION_FILE_NAME = "pysparksql.py"
 
-myCdeSparkJobDefinition = cdejob.CdeSparkJobDefinition(myCdeConnection)
-myCdeSparkJobDefinition.setSparkJobDefinition(CDE_JOB_NAME, CDE_RESOURCE_NAME, APPLICATION_FILE_NAME)
+myCdeSparkJob = cdejob.CdeSparkJob(myCdeConnection)
+myCdeSparkJobDefinition = myCdeSparkJob.createJobDefinition(CDE_JOB_NAME, CDE_RESOURCE_NAME, APPLICATION_FILE_NAME)
 
 ############################################
 # Create Resource and Job in CDE Cluster   #
 ############################################
 
-LOCAL_FILE_PATH = "cde_python/examples"
+LOCAL_FILE_PATH = "examples"
 LOCAL_FILE_NAME = "pysparksql.py"
 
 myCdeClusterManager = cdemanager.CdeClusterManager(myCdeConnection)

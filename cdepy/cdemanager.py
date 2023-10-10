@@ -2,8 +2,7 @@
 Module to manage CDE Clusters
 """
 
-from cdeconnection import CdeConnection
-from cdejob import CdeJobDefinition
+from cdepy.cdeconnection import CdeConnection
 import requests
 from datetime import datetime
 import pytz
@@ -77,7 +76,7 @@ class CdeClusterManager:
 
         x = requests.get(url+'?limit=100&offset=0&orderby=ID&orderasc=false', headers=headers)
 
-        return x
+        return x.text
 
         if x.status_code == 201:
             print("Listing Jobs Succeeded")
@@ -85,14 +84,14 @@ class CdeClusterManager:
             print(x.status_code)
             print(x.text)
 
-    def runJob(self, CDE_JOB_NAME, optionalSparkOverrides=None):
+    def runJob(self, CDE_JOB_NAME):
         """
         Method to trigger execution of CDE Job
         CDE Job could be of type Spark or Airflow
         The method assumes the CDE Job has already been created
         """
 
-        print("Running CDE Job {}".format(CDE_JOB_NAME))
+        payloadData = {"hidden":False}
 
         headers = {
             'Authorization': f"Bearer {self.TOKEN}",
@@ -101,6 +100,8 @@ class CdeClusterManager:
         }
 
         POST = "{}/jobs/".format(self.JOBS_API_URL)+CDE_JOB_NAME+"/run"
+
+        data = json.dumps(payloadData)
 
         x = requests.post(POST, headers=headers, data=data)
 
@@ -120,13 +121,12 @@ class CdeClusterManager:
         """
 
         print("CDE Resource Creation in Progress\n")
-        print("CDE Resource Name: {}\n".format(resource_name))
 
         url = self.JOBS_API_URL + "/resources"
         data_to_send = json.dumps(cdeRsourceDefinition).encode("utf-8")
 
         headers = {
-            'Authorization': f"Bearer {token}",
+            'Authorization': f"Bearer {self.TOKEN}",
             'accept': 'application/json',
             'Content-Type': 'application/json',
         }
@@ -134,7 +134,7 @@ class CdeClusterManager:
         x = requests.post(url, data=data_to_send, headers=headers)
 
         if x.status_code == 201:
-            print("CDE Resource {} Created Successfully".format(resource_name))
+            print("CDE Resource Created Successfully")
         else:
             print(x.status_code)
             print(x.text)
@@ -147,18 +147,17 @@ class CdeClusterManager:
         """
 
         print("CDE Resource Deletion in Progress\n")
-        print("CDE Resource Name: {}\n".format(resource_name))
 
         headers = {
             'accept': 'application/json',
         }
 
-        url = self.JOBS_API_URL + "/resources/" + resource_name
+        url = self.JOBS_API_URL + "/resources/" + cdeResourceName
 
         response = requests.delete(url, headers=headers)
 
         if x.status_code == 201:
-            print("CDE Resource {} Deleted Successfully\n".format(resource_name))
+            print("CDE Resource Deleted Successfully\n")
         else:
             print(x.status_code)
             print(x.text)
