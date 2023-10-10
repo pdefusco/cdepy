@@ -40,7 +40,7 @@ myCdeSparkJobDefinition.setSparkJobDefinition(CDE_JOB_NAME, CDE_RESOURCE_NAME, A
 # Create Resource and Job in CDE Cluster   #
 ############################################
 
-LOCAL_FILE_PATH = ""
+LOCAL_FILE_PATH = "cde_python/examples"
 LOCAL_FILE_NAME = "pysparksql.py"
 
 myCdeClusterManager = cdemanager.CdeClusterManager(myCdeConnection)
