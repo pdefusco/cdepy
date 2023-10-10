@@ -21,7 +21,7 @@ class CdeSparkJobDefinition(CdeJobDefinition):
     Class to define CDE Spark Jobs
     """
 
-    def __init__(self, cdeConnection, cdeSparkJobDefinition):
+    def __init__(self, cdeConnection, cdeSparkJobDefinition=None):
         self.cdeSparkJobDefinition = cdeSparkJobDefinition
         self.clusterConnection = cdeConnection
         self.WORKLOAD_USER = self.clusterConnection.WORKLOAD_USER

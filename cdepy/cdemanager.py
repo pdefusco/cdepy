@@ -111,7 +111,7 @@ class CdeClusterManager:
             print(x.status_code)
             print(x.text)
 
-    def create_resource(self, cdeRsourceDefinition):
+    def createResource(self, cdeRsourceDefinition):
         """
         Method to create CDE Resource
         Requires cdeRsourceDefinition as input
@@ -139,7 +139,7 @@ class CdeClusterManager:
             print(x.status_code)
             print(x.text)
 
-    def delete_resource(self, cdeResourceName):
+    def deleteResource(self, cdeResourceName):
         """
         Method to delete CDE Resource
         Requires cdeRsourceDefinition name as input
@@ -164,7 +164,7 @@ class CdeClusterManager:
             print(x.text)
 
     #Upload Spark CDE Job file to CDE Resource
-    def upload_file(self, CDE_RESOURCE_NAME, LOCAL_FILE_PATH, LOCAL_FILE_NAME):
+    def uploadFile(self, CDE_RESOURCE_NAME, LOCAL_FILE_PATH, LOCAL_FILE_NAME):
         """
         Method to uplaod files from local to CDE Resource
         Can be used to:

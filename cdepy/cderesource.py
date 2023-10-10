@@ -18,16 +18,16 @@ class CdeFilesResourceDefinition(CdeResourceDefinition):
     Class to define CDE Resource of type Files
     """
 
-    def __init__(self, type):
-        self.type = type
+    def __init__(self, CDE_RESOURCE_NAME):
+        self.CDE_RESOURCE_NAME = CDE_RESOURCE_NAME
 
-    def createResourceDefinition(self, CDE_RESOURCE_NAME):
+    def createResourceDefinition(self):
         """
         Method to create a CDE Resource Definition for CDE Resources of type Files
         """
 
         cdeFilesResourceDefinition = {
-                                    "name": str(CDE_RESOURCE_NAME),
+                                    "name": str(self.CDE_RESOURCE_NAME),
                                     "type":"files",
                                     "retention-policy" : "keep_indefinitely"
                                     }
