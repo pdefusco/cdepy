@@ -5,37 +5,54 @@ Module to define CDE Resources
 from abc import ABC, abstractmethod
 
 class CdeResourceDefinition(ABC):
-
     """
-    Class to define CDE Job
+    Abstract Class to define CDE Resource
     """
     @abstractmethod
-    def createJobDefinition(self):
-        pass
+    def createResourceDefinition(self):
+        raise NotImplementedError
 
 
 class CdeFilesResourceDefinition(CdeResourceDefinition):
-
     """
-    Class to define CDE Spark Jobs
+    Class to define CDE Resource of type Files
     """
 
     def __init__(self, type):
         self.type = type
 
-    def createJobDefinition(self):
+    def createResourceDefinition(self, CDE_RESOURCE_NAME):
+        """
+        Method to create a CDE Resource Definition for CDE Resources of type Files
+        """
 
-        pass
+        cdeFilesResourceDefinition = {
+                                    "name": str(CDE_RESOURCE_NAME),
+                                    "type":"files",
+                                    "retention-policy" : "keep_indefinitely"
+                                    }
+
+        return cdeFilesResourceDefinition
 
 class CdePythonResourceDefinition(CdeResourceDefinition):
-
     """
-    Class to define CDE Airflow Jobs
+    Class to define CDE Resource or type Python Environment
     """
 
     def __init__(self, type):
         self.type = type
 
-    def createJobDefinition(self):
+    def createResourceDefinition(self, CDE_RESOURCE_NAME):
+        """
+        Method to create a CDE Resource Definition for CDE Resources of type Python Environment
+        """
 
-        pass
+        cdePythonResourceDefinition = {
+                                    "name": str(CDE_RESOURCE_NAME),
+                                    "type": "python-env",
+                                    "python-version": "python3",
+                                    "retention-policy" : "keep_indefinitely"
+                                    }
+
+
+        return cdePythonResourceDefinition
