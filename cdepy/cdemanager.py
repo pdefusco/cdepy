@@ -88,7 +88,7 @@ class CdeClusterManager:
         """
         Method to trigger execution of CDE Job
         CDE Job could be of type Spark or Airflow
-        The method assumes the CDE Job has already been created
+        The method assumes the CDE Job has already been created in the CDE Virtual Cluster
         """
 
         payloadData = {"hidden":False}

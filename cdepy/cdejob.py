@@ -6,7 +6,6 @@ from abc import ABC, abstractmethod
 from cdepy.cdeconnection import CdeConnection
 
 class CdeJob(ABC):
-
     """
     Class to define CDE Job
     """
@@ -16,7 +15,6 @@ class CdeJob(ABC):
 
 
 class CdeSparkJob(CdeJob):
-
     """
     Class to define CDE Spark Jobs
     """
@@ -72,7 +70,6 @@ class CdeSparkJob(CdeJob):
 
 
 class CdeAirflowJob(CdeJob):
-
     """
     Class to define CDE Airflow Jobs
     """
