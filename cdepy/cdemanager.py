@@ -49,9 +49,36 @@ class CdeClusterManager:
             print(x.status_code)
             print(x.text)
 
-
     def deleteJob(self):
         raise NotImplementedError
+
+    def downloadAllJobRunLogs(self, jobRunId):
+        """
+        Method to download all logs for specified jobrun
+        Requires jobRunId; jobRunId is an integer; jobRunId can be obtained by running listJobRuns
+        """
+
+        url = self.JOBS_API_URL + "/job-runs/" + jobRunId + "/logs"
+        #url = self.JOBS_API_URL + "/job-runs/" + jobRunId + "logs?type=all"
+
+        headers = {
+            'accept': 'text/plain; charset=utf-8',
+        }
+
+        params = (
+            ('type', 'all'),
+        )
+
+        response = requests.get('https://58kqsms2.cde-g6hpr9f8.go01-dem.ylcu-atmi.cloudera.site/dex/api/v1/job-runs/1/logs', headers=headers, params=params)
+
+        #NB. Original query string below. It seems impossible to parse and
+        #reproduce query strings 100% accurately so the one below is given
+        #in case the reproduced version is not "correct".
+        # response = requests.get('https://58kqsms2.cde-g6hpr9f8.go01-dem.ylcu-atmi.cloudera.site/dex/api/v1/job-runs/1/logs?type=all', headers=headers)
+
+        """curl -X 'GET' \
+          'https://58kqsms2.cde-g6hpr9f8.go01-dem.ylcu-atmi.cloudera.site/dex/api/v1/job-runs/1/logs?type=all' \
+          -H 'accept: text/plain; charset=utf-8'"""
 
     def listJobs(self):
         raise NotImplementedError
@@ -84,7 +111,7 @@ class CdeClusterManager:
             print(x.status_code)
             print(x.text)
 
-    def runJob(self, CDE_JOB_NAME):
+    def runJob(self, CDE_JOB_NAME, SPARK_OVERRIDES, AIRFLOW_OVERRIDES):
         """
         Method to trigger execution of CDE Job
         CDE Job could be of type Spark or Airflow
@@ -92,6 +119,15 @@ class CdeClusterManager:
         """
 
         payloadData = {"hidden":False}
+
+        if SPARK_OVERRIDES != None and AIRFLOW_OVERRIDES != None:
+            print("Error: Spark Overrides and Airflow Overrides Specified\n")
+            print("You can only specify either Spark Overrides or Airflow Overrides, but not both!")
+            break
+        elif SPARK_OVERRIDES != None and AIRFLOW_OVERRIDES == None and isinstance(SPARK_OVERRIDES, dict):
+            payloadData.append(SPARK_OVERRIDES)
+        elif AIRFLOW_OVERRIDES != None and SPARK_OVERRIDES == None and isinstance(AIRFLOW_OVERRIDES, dict):
+            payloadData.append(AIRFLOW_OVERRIDES)
 
         headers = {
             'Authorization': f"Bearer {self.TOKEN}",
