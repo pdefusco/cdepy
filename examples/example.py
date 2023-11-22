@@ -38,8 +38,6 @@ myCdeFilesResourceDefinition
 
 CDE_JOB_NAME = "myCdeSparkJob"
 APPLICATION_FILE_NAME = "pysparksql.py"
-OPTIONAL_CONFIGS = {"executorMemory": "2g",
-                    "executorCores": 2}
 
 myCdeSparkJob = cdejob.CdeSparkJob(myCdeConnection)
 myCdeSparkJobDefinition = myCdeSparkJob.createJobDefinition(CDE_JOB_NAME, CDE_RESOURCE_NAME, APPLICATION_FILE_NAME, executorMemory="2g", executorCores=2)
