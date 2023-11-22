@@ -6,7 +6,9 @@ from cdepy import cdeconnection
 from cdepy import cdejob
 from cdepy import cdemanager
 from cdepy import cderesource
+from cdepy.utils import sparkEventLogParser
 import os
+import json
 
 ############################################
 # Create a Connection to CDE and set Token #
@@ -44,9 +46,9 @@ myCdeSparkJobDefinition = myCdeSparkJob.createJobDefinition(CDE_JOB_NAME, CDE_RE
 
 myCdeSparkJobDefinition
 
-############################################
-# Create Resource and Job in CDE Cluster   #
-############################################
+##########################################
+# Create Resource and Job in CDE Cluster #
+##########################################
 
 LOCAL_FILE_PATH = "examples"
 LOCAL_FILE_NAME = "pysparksql.py"
@@ -71,7 +73,10 @@ myCdeClusterManager.runJob(CDE_JOB_NAME)
 ### VALIDATE JOB RUNS ###
 #########################
 
-myCdeClusterManager.listJobRuns()
+# Please give the prior job run a minute to complete before moving on
+
+jobRuns = myCdeClusterManager.listJobRuns()
+json.loads(jobRuns)
 
 #####################
 ### DOWNLOAD LOGS ###
@@ -79,24 +84,26 @@ myCdeClusterManager.listJobRuns()
 
 JOB_RUN_ID = "1"
 logTypes = myCdeClusterManager.showAvailableLogTypes(JOB_RUN_ID)
-
-import json
 json.loads(logTypes)
 
 LOGS_TYPE = "driver/event"
 sparkEventLogs = myCdeClusterManager.downloadJobRunLogs(JOB_RUN_ID, LOGS_TYPE)
 
-#####################
-### DELETE JOB    ###
-#####################
+sparkEventLogsClean = sparkEventLogParser(sparkEventLogs)
+
+print(sparkEventLogsClean)
+
+###################
+### DELETE JOB  ###
+###################
 
 CDE_JOB_NAME = "myCdeSparkJob"
 
 myCdeClusterManager.deleteJob(CDE_JOB_NAME)
 
-####################
-### LIST JOBS    ###
-####################
+#################
+### LIST JOBS ###
+#################
 
 # Validate that the job is no longer there:
 
