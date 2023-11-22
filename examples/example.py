@@ -14,9 +14,9 @@ import json
 # Create a Connection to CDE and set Token #
 ############################################
 
-JOBS_API_URL = "https://549mv97k.cde-7g5k6lcj.se-sandb.a465-9q4k.cloudera.site/dex/api/v1"
-WORKLOAD_USER = "pauldefusco"
-WORKLOAD_PASSWORD = os.environ["WORKLOAD_PWD"]
+JOBS_API_URL = "https://<YOUR-CLUSTER>.cloudera.site/dex/api/v1"
+WORKLOAD_USER = "<Your-CDP-Workload-User>"
+WORKLOAD_PASSWORD = "<Your-CDP-Workload-Password>"
 
 myCdeConnection = cdeconnection.CdeConnection(JOBS_API_URL, WORKLOAD_USER, WORKLOAD_PASSWORD)
 
