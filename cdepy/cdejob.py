@@ -27,15 +27,18 @@ class CdeSparkJob(CdeJob):
         self.clusterConnection = cdeConnection
         self.WORKLOAD_USER = self.clusterConnection.WORKLOAD_USER
 
-    def hasKey(d, key, input_val, cdeSparkJobDefinition):
+    def hasKey(self, d, key, input_val, cdeSparkJobDefinition):
         try:
             if key in d:
                 val = d[key]
+                print("Spark Conf {} is found".format(key))
                 if val == None:
                     cdeSparkJobDefinition[key] = input_val
+                    print("Spark Conf {} is added".format(key))
                     return cdeSparkJobDefinition
                 else:
                     cdeSparkJobDefinition[val][key] = input_val
+                    print("Spark Conf {} is added".format(key))
                     return cdeSparkJobDefinition
         except:
             print("\nError Processing Option: ", key)
@@ -51,7 +54,7 @@ class CdeSparkJob(CdeJob):
         """
 
         cdeSparkJobDefinition = {
-              "name": CDE_JOB_NAME,# CDE Job Name As you want it to appear in the CDE JOBS UI
+              "name": CDE_JOB_NAME, #CDE Job Name As you want it to appear in the CDE JOBS UI
               "type": "spark",
               "retentionPolicy": "keep_indefinitely",
               "mounts": [
@@ -107,7 +110,8 @@ class CdeSparkJob(CdeJob):
             "workloadCredentials":"spark"}
 
         for param in kwargs:
-            cdeSparkJobDefinition = self.hasKey(sparkConfigs, key, kwargs[param], cdeSparkJobDefinition):
+            print(param)
+            cdeSparkJobDefinition = self.hasKey(sparkConfigs, param, kwargs[param], cdeSparkJobDefinition)
 
         return cdeSparkJobDefinition
 

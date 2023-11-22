@@ -25,6 +25,7 @@ class CdeClusterManager:
         self.JOBS_API_URL = self.clusterConnection.JOBS_API_URL
         self.TOKEN = self.clusterConnection.TOKEN
 
+
     def createJob(self, cdeJobDefinition):
         """
         Method to create a CDE Job
@@ -49,39 +50,114 @@ class CdeClusterManager:
             print(x.status_code)
             print(x.text)
 
-    def deleteJob(self):
-        raise NotImplementedError
 
-    def downloadAllJobRunLogs(self, jobRunId):
+    def deleteJob(self, cdeJobName):
+        """
+        Method to delete job
+        Requires cdeJobName as shown in the CDE Jobs UI
+        """
+
+        url = self.JOBS_API_URL + "/jobs/" + cdeJobName
+
+        headers = {
+            'Authorization': f"Bearer {self.TOKEN}",
+            'accept': 'application/json',
+            'Content-Type': 'application/json',
+        }
+
+        x = requests.delete(url, headers=headers)
+
+        if x.status_code == 201:
+            print("CDE Job Creation Succeeded\n")
+        else:
+            print(x.status_code)
+            print(x.text)
+
+    def showAvailableLogTypes(self, jobRunId):
+        """
+        Method to show all available log types for a specific Job Run
+        Job Log Types for Spark Jobs are:
+        1) driver/stdout
+        2) driver/stderr
+        3) driver/k8sevents i.e. Pod Event Logs
+        4) driver/event i.e. Spark Event Logs
+        5) executor_n/stdout e.g. executor_1/stdout, executor_2/stdout
+        6) driver/tgtloader
+        7) driver/workspace-init
+        8) submitter/stderr
+        9) submitter/stdout
+        10) submitter/k8s
+        11) submitter/jobs_api
+        """
+
+        url = self.JOBS_API_URL + "/job-runs/" + jobRunId + "/log-types"
+
+        headers = {
+            'Authorization': f"Bearer {self.TOKEN}",
+            'accept': 'application/json',
+            'Content-Type': 'application/json',
+        }
+
+        x = requests.get(url, headers=headers)
+
+        return x.text
+
+        if x.status_code == 201:
+            print("Downloading Job Logs Succeeded")
+        else:
+            print(x.status_code)
+            print(x.text)
+
+
+    def downloadJobRunLogs(self, jobRunId, logsType):
         """
         Method to download all logs for specified jobrun
         Requires jobRunId; jobRunId is an integer; jobRunId can be obtained by running listJobRuns
         """
 
-        url = self.JOBS_API_URL + "/job-runs/" + jobRunId + "/logs"
-        #url = self.JOBS_API_URL + "/job-runs/" + jobRunId + "logs?type=all"
+        url = self.JOBS_API_URL + "/job-runs/" + jobRunId + "/logs?type=" + logsType
 
         headers = {
-            'accept': 'text/plain; charset=utf-8',
+            'Authorization': f"Bearer {self.TOKEN}",
+            'accept': 'application/json',
+            'Content-Type': 'application/json',
         }
 
-        params = (
-            ('type', 'all'),
-        )
+        x = requests.get(url, headers=headers)
 
-        response = requests.get('https://58kqsms2.cde-g6hpr9f8.go01-dem.ylcu-atmi.cloudera.site/dex/api/v1/job-runs/1/logs', headers=headers, params=params)
+        return x.text
 
-        #NB. Original query string below. It seems impossible to parse and
-        #reproduce query strings 100% accurately so the one below is given
-        #in case the reproduced version is not "correct".
-        # response = requests.get('https://58kqsms2.cde-g6hpr9f8.go01-dem.ylcu-atmi.cloudera.site/dex/api/v1/job-runs/1/logs?type=all', headers=headers)
+        if x.status_code == 201:
+            print("Downloading Job Logs Succeeded")
+        else:
+            print(x.status_code)
+            print(x.text)
 
-        """curl -X 'GET' \
-          'https://58kqsms2.cde-g6hpr9f8.go01-dem.ylcu-atmi.cloudera.site/dex/api/v1/job-runs/1/logs?type=all' \
-          -H 'accept: text/plain; charset=utf-8'"""
 
     def listJobs(self):
-        raise NotImplementedError
+        """
+        Method to list CDE Jobs as shown in the CDE Jobs UI
+        Shows all jobs in the CDE Virtual Cluster
+        """
+
+        url = self.JOBS_API_URL + "/jobs"
+
+        headers = {
+            'Authorization': f"Bearer {self.TOKEN}",
+            'accept': 'application/json',
+            'Content-Type': 'application/json',
+        }
+
+        x = requests.get(url+'?latestjob=false&limit=20&offset=0&orderby=name&orderasc=true', headers=headers)
+
+        return x.text
+
+        if x.status_code == 201:
+            print("Listing Jobs Succeeded")
+        else:
+            print(x.status_code)
+            print(x.text)
+
 
     def listJobRuns(self):
         """
@@ -111,7 +187,8 @@ class CdeClusterManager:
             print(x.status_code)
             print(x.text)
 
-    def runJob(self, CDE_JOB_NAME, SPARK_OVERRIDES, AIRFLOW_OVERRIDES):
+
+    def runJob(self, CDE_JOB_NAME, SPARK_OVERRIDES=None, AIRFLOW_OVERRIDES=None):
         """
         Method to trigger execution of CDE Job
         CDE Job could be of type Spark or Airflow
@@ -123,7 +200,6 @@ class CdeClusterManager:
         if SPARK_OVERRIDES != None and AIRFLOW_OVERRIDES != None:
             print("Error: Spark Overrides and Airflow Overrides Specified\n")
             print("You can only specify either Spark Overrides or Airflow Overrides, but not both!")
-            break
         elif SPARK_OVERRIDES != None and AIRFLOW_OVERRIDES == None and isinstance(SPARK_OVERRIDES, dict):
             payloadData.append(SPARK_OVERRIDES)
         elif AIRFLOW_OVERRIDES != None and SPARK_OVERRIDES == None and isinstance(AIRFLOW_OVERRIDES, dict):
@@ -147,6 +223,7 @@ class CdeClusterManager:
         else:
             print(x.status_code)
             print(x.text)
+
 
     def createResource(self, cdeRsourceDefinition):
         """
@@ -175,6 +252,7 @@ class CdeClusterManager:
             print(x.status_code)
             print(x.text)
 
+
     def deleteResource(self, cdeResourceName):
         """
         Method to delete CDE Resource
@@ -182,21 +260,22 @@ class CdeClusterManager:
         e.g. cdeResourceName = str(resource_name)
         """
 
-        print("CDE Resource Deletion in Progress\n")
-
         headers = {
+            'Authorization': f"Bearer {self.TOKEN}",
             'accept': 'application/json',
+            'Content-Type': 'application/json',
         }
 
         url = self.JOBS_API_URL + "/resources/" + cdeResourceName
 
-        response = requests.delete(url, headers=headers)
+        x = requests.delete(url, headers=headers)
 
-        if x.status_code == 201:
-            print("CDE Resource Deleted Successfully\n")
+        if x.status_code == 204:
+            print("CDE Resource {} Deleted Successfully\n".format(cdeResourceName))
         else:
             print(x.status_code)
             print(x.text)
+
 
     #Upload Spark CDE Job file to CDE Resource
     def uploadFile(self, CDE_RESOURCE_NAME, LOCAL_FILE_PATH, LOCAL_FILE_NAME):
