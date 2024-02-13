@@ -73,6 +73,33 @@ class CdeClusterManager:
             print(x.status_code)
             print(x.text)
 
+
+    def updateJob(self, cdeJobName, cdeJobDefinition):
+        """
+        Method to update job definition
+        Requires cdeJobName as shown in the CDE Jobs UI
+        Requires cdeJobDefinition of type cdeAirflowJobDefinition or cdeSparkJobDefinition as input for payload
+        """
+
+        headers = {
+            'Authorization': f"Bearer {self.TOKEN}",
+            'accept': 'application/json',
+            'Content-Type': 'application/json',
+        }
+
+        PUT = '{}/jobs'.format(self.JOBS_API_URL)
+
+        data = json.dumps(cdeJobDefinition)
+
+        x = requests.post(PUT, headers=headers, data=data)
+
+        if x.status_code == 201:
+            print("CDE Job Update Succeeded\n")
+        else:
+            print(x.status_code)
+            print(x.text)
+
+
     def showAvailableLogTypes(self, jobRunId):
         """
         Method to show all available log types for a specific Job Run
@@ -134,7 +161,7 @@ class CdeClusterManager:
             print(x.text)
 
 
-    def listJobs(self):
+    def listJobs(self, filter, limit, offset):
         """
         Method to list CDE Jobs as shown in the CDE Jobs UI
         Shows all jobs in the CDE Virtual Cluster
@@ -159,7 +186,7 @@ class CdeClusterManager:
             print(x.text)
 
 
-    def listJobRuns(self):
+    def listJobRuns(self, filter, limit, offset):
         """
         Method to show all CDE Jobs that have been executed in the cluster
         Does not require input
@@ -168,6 +195,7 @@ class CdeClusterManager:
         tz_LA = pytz.timezone('America/Los_Angeles')
         now = datetime.now(tz_LA)
         print("Listing Jobs as of: {} PACIFIC STANDARD TIME\n".format(now))
+
 
         url = self.JOBS_API_URL + "/job-runs"
 
@@ -201,9 +229,9 @@ class CdeClusterManager:
             print("Error: Spark Overrides and Airflow Overrides Specified\n")
             print("You can only specify either Spark Overrides or Airflow Overrides, but not both!")
         elif SPARK_OVERRIDES != None and AIRFLOW_OVERRIDES == None and isinstance(SPARK_OVERRIDES, dict):
-            payloadData.append(SPARK_OVERRIDES)
+            payloadData.update(SPARK_OVERRIDES)
         elif AIRFLOW_OVERRIDES != None and SPARK_OVERRIDES == None and isinstance(AIRFLOW_OVERRIDES, dict):
-            payloadData.append(AIRFLOW_OVERRIDES)
+            payloadData.update(AIRFLOW_OVERRIDES)
 
         headers = {
             'Authorization': f"Bearer {self.TOKEN}",
@@ -277,8 +305,37 @@ class CdeClusterManager:
             print(x.text)
 
 
+    def describeResource(self, CDE_RESOURCE_NAME, includeFiles = True):
+        """
+        Method to get resource configuration and content
+        """
+
+        if includeFiles == True:
+            url = self.JOBS_API_URL + "/resources/" + CDE_RESOURCE_NAME + "?includeFiles=true"
+        elif includeFiles == False:
+            url = self.JOBS_API_URL + "/resources/" + CDE_RESOURCE_NAME + "?includeFiles=false"
+        else:
+            print("Error: Include Files Flag can only be set to True or False")
+
+        headers = {
+            'Authorization': f"Bearer {self.TOKEN}",
+            'accept': 'application/json',
+            'Content-Type': 'application/json',
+        }
+
+        x = requests.get(url, headers=headers)
+
+        return x.text
+
+        if x.status_code == 201:
+            print("Downloading Job Logs Succeeded")
+        else:
+            print(x.status_code)
+            print(x.text)
+
+
     #Upload Spark CDE Job file to CDE Resource
-    def uploadFile(self, CDE_RESOURCE_NAME, LOCAL_FILE_PATH, LOCAL_FILE_NAME):
+    def uploadFileToResource(self, CDE_RESOURCE_NAME, LOCAL_FILE_PATH, LOCAL_FILE_NAME):
         """
         Method to uplaod files from local to CDE Resource
         Can be used to:
@@ -306,3 +363,168 @@ class CdeClusterManager:
         else:
             print(x.status_code)
             print(x.text)
+
+
+    def uploadArchiveToResource(self, CDE_RESOURCE_NAME, LOCAL_FILE_PATH, LOCAL_FILE_NAME):
+        """
+        Method to Upload an archive(.zip or .tar.gz archives)
+        to the resource with an optional directory prefix.
+        New files are added and existing files are overwritten
+        """
+
+        raise NotImplementedError
+
+
+    def removeFileFromResource(self, CDE_RESOURCE_NAME, RESOURCE_FILE_NAME):
+        """
+        Method to remove a file from a CDE Resource of type Files
+        """
+
+        url = self.JOBS_API_URL + "/resources/" + CDE_RESOURCE_NAME + "/" + RESOURCE_FILE_NAME
+
+        headers = {
+            'Authorization': f"Bearer {self.TOKEN}",
+            'accept': 'application/json',
+            'Content-Type': 'application/json',
+        }
+
+        x = requests.delete(url, headers=headers)
+
+        if x.status_code == 201:
+            print("File Removal Succeeded\n")
+        else:
+            print(x.status_code)
+            print(x.text)
+
+
+    def downloadFileFromResource(self, CDE_RESOURCE_NAME, RESOURCE_FILE_NAME):
+        """
+        Method to download a file in the resource at the path specified
+        """
+
+        url = self.JOBS_API_URL + "/resources/" + CDE_RESOURCE_NAME + "/" + RESOURCE_FILE_NAME
+
+        headers = {
+            'Authorization': f"Bearer {self.TOKEN}",
+            'accept': 'application/octet-stream',
+            'Content-Type': 'application/json',
+        }
+
+        x = requests.get(url, headers=headers)
+
+        return x.text
+
+        if x.status_code == 201:
+            print("Downloading Resource File Succeeded")
+        else:
+            print(x.status_code)
+            print(x.text)
+
+
+    def pauseAllJobs(self):
+        """
+        Method to pause all jobs in a CDE Virtual Cluster
+        """
+
+        headers = {
+            'Authorization': f"Bearer {self.TOKEN}",
+            'accept': 'application/json',
+            'Content-Type': 'application/json',
+        }
+
+        PUT = '{}/jobs/schedule/pause-all'.format(self.JOBS_API_URL)
+
+        x = requests.post(PUT, headers=headers)
+
+        if x.status_code == 201:
+            print("All CDE Jobs Paused Successfully\n")
+        else:
+            print(x.status_code)
+            print(x.text)
+
+
+    def unpauseAllJobs(self):
+        """
+        Method to unpuase all paused jobs in a CDE Virtual Cluster
+        """
+
+        headers = {
+            'Authorization': f"Bearer {self.TOKEN}",
+            'accept': 'application/json',
+            'Content-Type': 'application/json',
+        }
+
+        PUT = '{}/jobs/schedule/unpause-all'.format(self.JOBS_API_URL)
+
+        data = json.dumps(cdeJobDefinition)
+
+        x = requests.post(PUT, headers=headers)
+
+        if x.status_code == 201:
+            print("All CDE Jobs Unpaused Successfully\n")
+        else:
+            print(x.status_code)
+            print(x.text)
+
+
+    def pauseSingleJob(self, CDE_JOB_NAME):
+        """
+        Method to pause a single unpaused job
+        """
+
+        headers = {
+            'Authorization': f"Bearer {self.TOKEN}",
+            'accept': 'application/json',
+            'Content-Type': 'application/json',
+        }
+
+        POST = "{}/jobs/".format(self.JOBS_API_URL) + CDE_JOB_NAME + "/schedule/pause"
+
+        x = requests.post(POST, headers=headers)
+
+        if x.status_code == 201:
+            print("CDE Job Submission has Succeeded\n")
+            print("Please visit the CDE Job Runs UI to validate CDE Job Status\n")
+        else:
+            print(x.status_code)
+            print(x.text)
+
+
+    def unpauseSingleJob(self, CDE_JOB_NAME):
+        """
+        Method to unpuase a single paused job
+        """
+
+        headers = {
+            'Authorization': f"Bearer {self.TOKEN}",
+            'accept': 'application/json',
+            'Content-Type': 'application/json',
+        }
+
+        POST = "{}/jobs/".format(self.JOBS_API_URL) + CDE_JOB_NAME + "/schedule/unpause"
+
+        x = requests.post(POST, headers=headers)
+
+        if x.status_code == 201:
+            print("CDE Job Submission has Succeeded\n")
+            print("Please visit the CDE Job Runs UI to validate CDE Job Status\n")
+        else:
+            print(x.status_code)
+            print(x.text)
+
+
+    def listVcMeta(self):
+        """
+        Method to provide configuration information
+        and useful parameters for the CDE Virtual Cluster
+        """
+
+        headers = {
+            'Authorization': f"Bearer {self.TOKEN}",
+            'accept': 'application/json',
+            'Content-Type': 'application/json',
+            }
+
+        x = requests.get(self.JOBS_API_URL+'/info', headers=headers)
+
+        return json.loads(x.text)
