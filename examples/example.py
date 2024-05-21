@@ -14,9 +14,9 @@ import json
 # Create a Connection to CDE and set Token #
 ############################################
 
-JOBS_API_URL = "https://<YOUR-CLUSTER>.cloudera.site/dex/api/v1"
-WORKLOAD_USER = "<Your-CDP-Workload-User>"
-WORKLOAD_PASSWORD = "<Your-CDP-Workload-Password>"
+JOBS_API_URL = "https://jcxk6ghn.cde-ntvvr5hx.go01-dem.ylcu-atmi.cloudera.site/dex/api/v1"
+WORKLOAD_USER = "pauldefusco"
+WORKLOAD_PASSWORD = "Paolino1987!"
 
 myCdeConnection = cdeconnection.CdeConnection(JOBS_API_URL, WORKLOAD_USER, WORKLOAD_PASSWORD)
 
@@ -58,7 +58,7 @@ myCdeClusterManager = cdemanager.CdeClusterManager(myCdeConnection)
 #############################################################
 
 myCdeClusterManager.createResource(myCdeFilesResourceDefinition)
-myCdeClusterManager.uploadFile(CDE_RESOURCE_NAME, LOCAL_FILE_PATH, LOCAL_FILE_NAME)
+myCdeClusterManager.uploadFileToResource(CDE_RESOURCE_NAME, LOCAL_FILE_PATH, LOCAL_FILE_NAME)
 
 ###################################
 ### CREATE SPARK JOB AND RUN IT ###
@@ -80,7 +80,7 @@ json.loads(jobRuns)
 ### DOWNLOAD LOGS ###
 #####################
 
-JOB_RUN_ID = "1"
+JOB_RUN_ID = "55791"
 logTypes = myCdeClusterManager.showAvailableLogTypes(JOB_RUN_ID)
 json.loads(logTypes)
 

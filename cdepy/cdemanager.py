@@ -161,7 +161,7 @@ class CdeClusterManager:
             print(x.text)
 
 
-    def listJobs(self, filter, limit, offset):
+    def listJobs(self):
         """
         Method to list CDE Jobs as shown in the CDE Jobs UI
         Shows all jobs in the CDE Virtual Cluster
@@ -186,7 +186,7 @@ class CdeClusterManager:
             print(x.text)
 
 
-    def listJobRuns(self, filter, limit, offset):
+    def listJobRuns(self):
         """
         Method to show all CDE Jobs that have been executed in the cluster
         Does not require input

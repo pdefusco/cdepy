@@ -35,13 +35,13 @@ class CdeFilesResource(CdeResource):
 
 class CdePythonResource(CdeResource):
     """
-    Class to define CDE Resource or type Python Environment
+    Class to define CDE Resource of type Python Environment
     """
 
-    def __init__(self, type):
-        self.type = type
+    def __init__(self, CDE_RESOURCE_NAME):
+        self.CDE_RESOURCE_NAME = CDE_RESOURCE_NAME
 
-    def createResourceDefinition(self, CDE_RESOURCE_NAME):
+    def createResourceDefinition(self):
         """
         Method to create a CDE Resource Definition for CDE Resources of type Python Environment
         """
@@ -55,3 +55,30 @@ class CdePythonResource(CdeResource):
 
 
         return cdePythonResourceDefinition
+
+
+class CdeRepository(CdeResource):
+    """
+    Class to define CDE Resource of type Git Repository
+    """
+
+    def __init__(self, CDE_RESOURCE_NAME):
+      self.CDE_RESOURCE_NAME = CDE_RESOURCE_NAME
+
+    def createResourceDefinition(self):
+        """
+        Method to create a CDE git repository definition for CDE Resources of type git repository
+        """
+
+        cdeRepositoryDefinition = {
+          "git": {
+            "branch": "string",
+            "credential": "string",
+            "currentPath": "string",
+            "insecureSkipTLS": True,
+            "repository": "string",
+            "sizeBytes": 0
+          },
+          "name": str(CDE_RESOURCE_NAME),
+          "skipCredentialValidation": True
+        }
