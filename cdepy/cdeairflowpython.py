@@ -208,4 +208,23 @@ class CdeAirflowPythonEnv():
     else:
         print(x.status_code)
         print(x.text)
+
+
+  def getAirflowPythonEnvironmentDetails(self):
+    """
+    Method to obtain description of airflow python env that is currently handled in the maintenance operation.
+    """
+
+    headers = {
+        'Authorization': f"Bearer {self.TOKEN}",
+        'accept': 'application/json',
+    }
+
+    x = requests.get('{}/admin/airflow/env/maintenance'.format(self.JOBS_API_URL), headers=headers)
+
+    if x.status_code == 201:
+        print("Current Airflow Python Env Details Request has succeeded\n")
+    else:
+        print(x.status_code)
+        print(x.text)
     
