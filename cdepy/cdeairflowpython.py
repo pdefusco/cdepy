@@ -1,5 +1,5 @@
 """
-Module to create a Connection to a CDE Virtual Cluster
+Module to manage Airflow Python Environments
 """
 
 import numpy as np
@@ -210,12 +210,3 @@ class CdeAirflowPythonEnv(self):
     else:
         print(x.status_code)
         print(x.text)
-
-
-
-
-
-
-
-
-    
