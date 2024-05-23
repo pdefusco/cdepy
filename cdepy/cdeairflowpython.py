@@ -1,5 +1,5 @@
 """
-Module to manage Airflow Python Environments
+Module to create a Connection to a CDE Virtual Cluster
 """
 
 import numpy as np
@@ -11,7 +11,7 @@ import pyparsing
 import os, json, requests, re, sys
 from cdepy.cdeconnection import CdeConnection
 
-class CdeAirflowPythonEnv(self):
+class CdeAirflowPythonEnv():
   """
   Class to manage Airflow Python Env maintenance sessions
   """
@@ -33,7 +33,7 @@ class CdeAirflowPythonEnv(self):
         'Content-Type': 'application/json',
     }
 
-    POST = "{}/dex/api/v1/admin/airflow/env/maintenance".format(self.JOBS_API_URL)
+    POST = "{}/admin/airflow/env/maintenance".format(self.JOBS_API_URL)
 
     x = requests.post(POST, headers=headers)
 
@@ -62,9 +62,10 @@ class CdeAirflowPythonEnv(self):
         'Content-Type': 'application/json',
     }
 
-    POST = "{}/dex/api/v1/admin/airflow/env/maintenance/repos".format(self.JOBS_API_URL)
+    POST = "{}/admin/airflow/env/maintenance/repos".format(self.JOBS_API_URL)
 
-    payloadData = '{"pipRepository": { "url": "https://pypi.org/simple/" }}'
+    payloadData = {"pipRepository": {"url": "https://pypi.org/simple/"}}
+    #"skipCertValidation": true,
 
     data = json.dumps(payloadData)
 
@@ -87,7 +88,7 @@ class CdeAirflowPythonEnv(self):
         'accept': 'application/json',
     }
 
-    x = requests.get('{}/dex/api/v1/admin/airflow/env/maintenance/status'.format(self.JOBS_API_URL), headers=headers)
+    x = requests.get('{}/admin/airflow/env/maintenance/status'.format(self.JOBS_API_URL), headers=headers)
 
     if x.status_code == 201:
         print("CDE Airflow Python Environment Status Check has Succeeded\n")
@@ -101,16 +102,13 @@ class CdeAirflowPythonEnv(self):
     Method to build the airflow python environment with the provided requirements.txt file
     """
 
-    headers = {
-        'accept': 'application/json',
-        'Content-Type': 'multipart/form-data',
-    }
+    m = MultipartEncoder(
+        fields={
+                'file': ('filename', open(pathToRequirementsTxt, 'rb'), 'text/plain')}
+        )
 
-    files = {
-        'file': ('requirements.txt;type', open('{};type'.format(pathToRequirementsTxt), 'rb')),
-    }
-
-    x = requests.post('{}/dex/api/v1/admin/airflow/env/maintenance/build'.format(self.JOBS_API_URL), headers=headers, files=files)
+    x = requests.post('{}/admin/airflow/env/maintenance/build'.format(self.JOBS_API_URL), data=m,
+                      headers={'Authorization': f"Bearer {self.TOKEN}",'Content-Type': m.content_type})
 
     if x.status_code == 201:
         print("CDE Airflow Python Env Build has succeeded\n")
@@ -125,11 +123,11 @@ class CdeAirflowPythonEnv(self):
     """
 
     headers = {
-        'Authorization': f"Bearer {self.CDE_TOKEN}",
+        'Authorization': f"Bearer {self.TOKEN}",
         'accept': 'application/json',
     }
 
-    x = requests.post('{}/dex/api/v1/admin/airflow/env/maintenance/activate'.format(self.JOBS_API_URL), headers=headers)
+    x = requests.post('{}/admin/airflow/env/maintenance/activate'.format(self.JOBS_API_URL), headers=headers)
 
     if x.status_code == 201:
         print("CDE Airflow Python Env Activation has succeeded\n")
@@ -147,7 +145,7 @@ class CdeAirflowPythonEnv(self):
         'accept': 'application/json',
     }
 
-    response = requests.delete('{}/dex/api/v1/admin/airflow/env'.format(self.JOBS_API_URL), headers=headers)
+    x = requests.delete('{}/admin/airflow/env'.format(self.JOBS_API_URL), headers=headers)
 
     if x.status_code == 201:
         print("CDE Airflow Python Env Deletion has succeeded\n")
@@ -165,7 +163,7 @@ class CdeAirflowPythonEnv(self):
         'accept': 'application/json',
     }
 
-    x = requests.delete('{}/dex/api/v1/admin/airflow/env/maintenance'.format(self.JOBS_API_URL), headers=headers)
+    x = requests.delete('{}/admin/airflow/env/maintenance'.format(self.JOBS_API_URL), headers=headers)
 
     if x.status_code == 201:
         print("CDE Airflow Python Env Deletion has succeeded\n")
@@ -180,11 +178,11 @@ class CdeAirflowPythonEnv(self):
     """
 
     headers = {
-        'Authorization': f"Bearer {self.CDE_TOKEN}",
+        'Authorization': f"Bearer {self.TOKEN}",
         'accept': 'application/json',
     }
 
-    x = requests.get('{}/dex/api/v1/admin/airflow/env/maintenance/logs'.format(self.JOBS_API_URL), headers=headers)
+    x = requests.get('{}/admin/airflow/env/maintenance/logs'.format(self.JOBS_API_URL), headers=headers)
 
     if x.status_code == 201:
         print("CDE Airflow Python Env Deletion has succeeded\n")
@@ -199,14 +197,15 @@ class CdeAirflowPythonEnv(self):
     """
 
     headers = {
-        'Authorization': f"Bearer {self.CDE_TOKEN}",
+        'Authorization': f"Bearer {self.TOKEN}",
         'accept': 'application/json',
     }
 
-    x = requests.get('{}/dex/api/v1/admin/airflow/env/logs'.format(self.JOBS_API_URL), headers=headers)
+    x = requests.get('{}/admin/airflow/env/logs'.format(self.JOBS_API_URL), headers=headers)
 
     if x.status_code == 201:
         print("CDE Airflow Python Env Deletion has succeeded\n")
     else:
         print(x.status_code)
         print(x.text)
+    
