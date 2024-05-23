@@ -220,7 +220,7 @@ class CdeAirflowPythonEnv():
         'accept': 'application/json',
     }
 
-    x = requests.get('{}/admin/airflow/env/maintenance'.format(self.JOBS_API_URL), headers=headers)
+    x = requests.get('{}/admin/airflow/env'.format(self.JOBS_API_URL), headers=headers)
 
     if x.status_code == 201:
         print("Current Airflow Python Env Details Request has succeeded\n")
