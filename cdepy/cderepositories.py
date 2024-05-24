@@ -11,7 +11,6 @@ import pyparsing
 import os, json, requests, re, sys
 from cdepy.cdeconnection import CdeConnection
 
-
 class CdeRepository():
   """
   Class to manage CDE Repositories
@@ -28,44 +27,144 @@ class CdeRepository():
     Method to list all repositories
     """
 
-    pass
+    headers = {
+        'Authorization': f"Bearer {self.TOKEN}",
+        'accept': 'application/json',
+        'Content-Type': 'application/json',
+    }
+
+    params = (
+        ('includeFiles', 'true'),
+        ('limit', '100'),
+        ('offset', '0'),
+        ('orderby', 'name'),
+        ('orderasc', 'true'),
+    )
+
+    x = requests.get('{}/repositories'.format(self.JOBS_API_URL), headers=headers, params=params)
+
+    return x.text
+
+    if x.status_code == 201:
+        print("Listing CDE Repositories has Succeeded\n")
+    else:
+        print(x.status_code)
+        print(x.text)
 
 
-  def createRepository(self, name):
+  def createRepository(self, repoBranch="main", repoCredentials=None, repoName, repoPath):
     """
     Method to create a repository
     """
 
-    pass
+    repoDefinition = {
+      "git": {
+        "branch": repoBranch,
+        "repository": repoPath,
+      },
+      "name": repoName,
+      "skipCredentialValidation": True
+    }
+
+    headers = {
+        'Authorization': f"Bearer {self.TOKEN}",
+        'accept': 'application/json',
+        'Content-Type': 'application/json',
+    }
+
+    x = requests.post('{}/repositories'.format(self.JOBS_API_URL), headers=headers, data=data)
+
+    if x.status_code == 201:
+        print("CDE Repository Creation has Succeeded\n")
+    else:
+        print(x.status_code)
+        print(x.text)
 
 
-  def describeRepository(self, name):
+  def describeRepository(self, repoName):
     """
     Method to describe a repository
     """
 
-    pass
+    headers = {
+        'Authorization': f"Bearer {self.TOKEN}",
+        'accept': 'application/json',
+        'Content-Type': 'application/json',
+    }
+
+    params = (
+        ('includeFiles', 'true'),
+    )
+
+    x = requests.get('{0}/repositories/{1}'.format(self.JOBS_API_URL, repoName), headers=headers, params=params)
+
+    if x.status_code == 201:
+        print("CDE Repository Description has Succeeded\n")
+    else:
+        print(x.status_code)
+        print(x.text)
 
 
-  def pullRepository(self, name):
+  def pullRepository(self, repoName):
     """
     Method to pull latest commit from repository
     """
 
-    pass
+    headers = {
+        'Authorization': f"Bearer {self.TOKEN}",
+        'accept': 'application/json',
+        'Content-Type': 'application/json',
+    }
+
+    x = requests.post('{0}/repositories/{1}'.format(self.JOBS_API_URL, repoName), headers=headers)
+
+    if x.status_code == 201:
+        print("CDE Repository Description has Succeeded\n")
+    else:
+        print(x.status_code)
+        print(x.text)
 
 
-  def deleteRepository(self, name):
+  def deleteRepository(self, repoName):
     """
     Method to delete a repository in CDE
     """
 
-    pass
+    headers = {
+        'Authorization': f"Bearer {self.TOKEN}",
+        'accept': 'application/json',
+        'Content-Type': 'application/json',
+    }
+
+    x = requests.delete('{0}/repositories/{1}'.format(self.JOBS_API_URL, repoName), headers=headers)
+
+    if x.status_code == 201:
+        print("CDE Repository Description has Succeeded\n")
+    else:
+        print(x.status_code)
+        print(x.text)
 
 
-  def downloadFileFromRepo(self, name, filepath):
+  def downloadFileFromRepo(self, repoName, filePath):
     """
     Method to download a file from a CDE repository
     """
 
-    pass
+    headers = {
+    'Authorization': f"Bearer {self.TOKEN}",
+    'accept': 'application/octet-stream',
+    'Content-Type': 'application/json'
+    }
+
+    x = requests.get('{}/repositories/{}/{}'.format(self.JOBS_API_URL, repoName, filePath), headers=headers)
+
+    return x
+
+    if x.status_code == 201:
+        print("CDE Repository Description has Succeeded\n")
+    else:
+        print(x.status_code)
+        print(x.text)
+
+
+  
