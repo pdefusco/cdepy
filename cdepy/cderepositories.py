@@ -11,7 +11,7 @@ import pyparsing
 import os, json, requests, re, sys
 from cdepy.cdeconnection import CdeConnection
 
-class CdeRepository():
+class CdeRepositoryManager():
   """
   Class to manage CDE Repositories
   """
@@ -52,7 +52,7 @@ class CdeRepository():
         print(x.text)
 
 
-  def createRepository(self, repoBranch="main", repoCredentials=None, repoName, repoPath):
+  def createRepository(self, repoName, repoPath, repoCredentials=None, repoBranch="main"):
     """
     Method to create a repository
     """
@@ -60,11 +60,13 @@ class CdeRepository():
     repoDefinition = {
       "git": {
         "branch": repoBranch,
-        "repository": repoPath,
+        "repository": repoPath
       },
       "name": repoName,
       "skipCredentialValidation": True
     }
+
+    data = json.dumps(repoDefinition)
 
     headers = {
         'Authorization': f"Bearer {self.TOKEN}",
@@ -158,7 +160,7 @@ class CdeRepository():
 
     x = requests.get('{}/repositories/{}/{}'.format(self.JOBS_API_URL, repoName, filePath), headers=headers)
 
-    return x
+    return x.content
 
     if x.status_code == 201:
         print("CDE Repository Description has Succeeded\n")
