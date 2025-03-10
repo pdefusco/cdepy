@@ -52,7 +52,7 @@ class CdeRepositoryManager():
         print(x.text)
 
 
-  def createRepository(self, repoName, repoPath, repoCredentials=None, repoBranch="main"):
+  def createRepository(self, repoName, repoPath, repoCredentialName=None, repoBranch="main"):
     """
     Method to create a repository
     """
@@ -60,7 +60,8 @@ class CdeRepositoryManager():
     repoDefinition = {
       "git": {
         "branch": repoBranch,
-        "repository": repoPath
+        "repository": repoPath,
+        "credential": repoCredentialName
       },
       "name": repoName,
       "skipCredentialValidation": True
@@ -99,6 +100,7 @@ class CdeRepositoryManager():
     )
 
     x = requests.get('{0}/repositories/{1}'.format(self.JOBS_API_URL, repoName), headers=headers, params=params)
+    return x.text
 
     if x.status_code == 201:
         print("CDE Repository Description has Succeeded\n")
@@ -168,5 +170,21 @@ class CdeRepositoryManager():
         print(x.status_code)
         print(x.text)
 
+  def syncRepository(self, repoName):
+    """
+    Method to sync a cde repo with its git origin
+    """
 
-  
+    headers = {
+        'accept': 'application/json',
+    }
+
+    response = requests.post('{}/repositories/{}'.format(self.JOBS_API_URL, repoName), headers=headers)
+
+    return x.content
+
+    if x.status_code == 201:
+        print("CDE Repository Sync with Git Origin has Succeeded\n")
+    else:
+        print(x.status_code)
+        print(x.text)
