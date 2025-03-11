@@ -176,10 +176,12 @@ class CdeRepositoryManager():
     """
 
     headers = {
-        'accept': 'application/json',
+    'Authorization': f"Bearer {self.TOKEN}",
+    'accept': 'application/octet-stream',
+    'Content-Type': 'application/json'
     }
 
-    response = requests.post('{}/repositories/{}'.format(self.JOBS_API_URL, repoName), headers=headers)
+    x = requests.post('{}/repositories/{}'.format(self.JOBS_API_URL, repoName), headers=headers)
 
     return x.content
 
